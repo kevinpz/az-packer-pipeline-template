@@ -15,7 +15,6 @@ variable "src_image_sku" {
   type = string
 }
 
-
 # location
 variable "location" {
   type = string
