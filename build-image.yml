@@ -34,10 +34,6 @@ parameters:
 - name: image_build_sku
   type: string 
   default: 'Standard_D2ds_v4'
-# VM size for building the image
-- name: image_build_size
-  type: number
-  default: 30
 
 stages:
 # Create the image definition in the compute image gallery
@@ -90,28 +86,33 @@ stages:
       - checkout: self
       - checkout: az-packer-pipeline-template
       # Replace the variable inside the image template
-      - task: CmdLine@2
-        inputs:
-          script: 'bash ./set_variables.sh'
-          workingDirectory: './az-packer-pipeline-template/scripts'
-        env:
-          subscription_id: ${{ variables.subscription_id }}
-          rg_name: ${{ variables.rg_name }}
-          image_name: ${{ parameters.image_name }}
-          gallery_name: ${{ variables.gallery_name }}
-          location: ${{ variables.location }}
-          id_name: ${{ variables.id_name }}
-          src_image_publisher: ${{ parameters.src_image_publisher }}
-          src_image_offer: ${{ parameters.src_image_offer }}
-          src_image_sku: ${{ parameters.src_image_sku }}
-          image_build_sku: ${{ parameters.image_build_sku }}
-          image_build_size: ${{ parameters.image_build_size }}
+      # - task: CmdLine@2
+      #   inputs:
+      #     script: 'bash ./set_variables.sh'
+      #     workingDirectory: './az-packer-pipeline-template/scripts'
+      #   env:
+      #     subscription_id: ${{ variables.subscription_id }}
+      #     rg_name: ${{ variables.rg_name }}
+      #     image_name: ${{ parameters.image_name }}
+      #     gallery_name: ${{ variables.gallery_name }}
+      #     location: ${{ variables.location }}
+      #     id_name: ${{ variables.id_name }}
+      #     src_image_publisher: ${{ parameters.src_image_publisher }}
+      #     src_image_offer: ${{ parameters.src_image_offer }}
+      #     src_image_sku: ${{ parameters.src_image_sku }}
+      #     image_build_sku: ${{ parameters.image_build_sku }}
+      #     image_build_size: ${{ parameters.image_build_size }}
       # Build the VM image
-      - task: AzureCLI@2
+      - task: PackerBuild@1
         inputs:
-          workingDirectory: './az-packer-pipeline-template/scripts'
-          azureSubscription: '${{ variables.sc_name }}'
-          scriptType: 'bash'
-          scriptLocation: 'scriptPath'
-          arguments: '${{ variables.subscription_id }} ${{ variables.rg_name }}'
-          scriptPath: './az-packer-pipeline-template/scripts/build.sh'
+          connectedServiceName: '${{ variables.sc_name }}'
+          templatePath: template/image_template.pkr.hcl
+          variables: |+
+            src_image_publisher=${{ parameters.src_image_publisher }}
+            src_image_offer=${{ parameters.src_image_offer }}
+            src_image_sku=${{ parameters.src_image_sku }}
+            location=${{ variables.location }}
+            rg_name=${{ variables.rg_name }}
+            image_type=${{ parameters.image_type }}
+            image_name=${{ parameters.image_name }}
+            image_build_sku=${{ parameters.image_build_sku }}
