@@ -101,7 +101,6 @@ stages:
           src_image_offer: ${{ parameters.src_image_offer }}
           src_image_sku: ${{ parameters.src_image_sku }}
           image_build_sku: ${{ parameters.image_build_sku }}
-          image_build_size: ${{ parameters.image_build_size }}
       # Build the VM image
       - task: PackerBuild@1
         inputs:
