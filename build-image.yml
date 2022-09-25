@@ -107,7 +107,7 @@ stages:
         inputs:
           connectedServiceName: '${{ variables.sc_name }}'
           templateType: custom
-          customTemplateLocation: template/image_template.pkr.hcl
+          customTemplateLocation: ./az-packer-pipeline-template/template/image_template.pkr.hcl
           isManagedImage: false
           variables: |+
             src_image_publisher=${{ parameters.src_image_publisher }}
