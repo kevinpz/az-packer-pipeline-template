@@ -1,9 +1,8 @@
-sed -i -e "s/<subscription_id>/${subscription_id}/g" ../template/image_template.json
 sed -i -e "s/<rg_name>/${rg_name}/g" ../template/image_template.json
 sed -i -e "s/<image_name>/${image_name}/g" ../template/image_template.json
 sed -i -e "s/<gallery_name>/${gallery_name}/g" ../template/image_template.json
-sed -i -e "s/<region_1>/${location}/g" ../template/image_template.json
-sed -i -e "s/<id_name>/${id_name}/g" ../template/image_template.json
+sed -i -e "s/<location>/${location}/g" ../template/image_template.json
+sed -i -e "s/<image_type>/${image_type}/g" ../template/image_template.json
 sed -i -e "s/<src_image_publisher>/${src_image_publisher}/g" ../template/image_template.json
 sed -i -e "s/<src_image_offer>/${src_image_offer}/g" ../template/image_template.json
 sed -i -e "s/<src_image_sku>/${src_image_sku}/g" ../template/image_template.json

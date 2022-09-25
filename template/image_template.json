@@ -1,0 +1,26 @@
+{
+  "builders": [{
+    "type": "azure-arm",
+    "managed_image_resource_group_name": "<rg_name>",
+    "managed_image_name": "<image_name>",
+    "os_type": "<image_type>",
+    "image_publisher": "<src_image_publisher>",
+    "image_offer": "<src_image_offer>",
+    "image_sku": "<rg_src_image_skuname>",
+    "location": "<location>",
+    "vm_size": "<image_build_sku>"
+  }],
+
+  "provisioners": [{
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+    "inline": [
+      "apt-get update",
+      "apt-get upgrade -y",
+      "apt-get -y install nginx",
+
+      "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+    ],
+    "inline_shebang": "/bin/sh -x",
+    "type": "shell"
+  }]
+}

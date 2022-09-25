@@ -86,35 +86,26 @@ stages:
       - checkout: self
       - checkout: az-packer-pipeline-template
       # Replace the variable inside the image template
-      # - task: CmdLine@2
-      #   inputs:
-      #     script: 'bash ./set_variables.sh'
-      #     workingDirectory: './az-packer-pipeline-template/scripts'
-      #   env:
-      #     subscription_id: ${{ variables.subscription_id }}
-      #     rg_name: ${{ variables.rg_name }}
-      #     image_name: ${{ parameters.image_name }}
-      #     gallery_name: ${{ variables.gallery_name }}
-      #     location: ${{ variables.location }}
-      #     id_name: ${{ variables.id_name }}
-      #     src_image_publisher: ${{ parameters.src_image_publisher }}
-      #     src_image_offer: ${{ parameters.src_image_offer }}
-      #     src_image_sku: ${{ parameters.src_image_sku }}
-      #     image_build_sku: ${{ parameters.image_build_sku }}
-      #     image_build_size: ${{ parameters.image_build_size }}
+      - task: CmdLine@2
+        inputs:
+          script: 'bash ./set_variables.sh'
+          workingDirectory: './az-packer-pipeline-template/scripts'
+        env:
+          subscription_id: ${{ variables.subscription_id }}
+          rg_name: ${{ variables.rg_name }}
+          image_name: ${{ parameters.image_name }}
+          gallery_name: ${{ variables.gallery_name }}
+          location: ${{ variables.location }}
+          id_name: ${{ variables.id_name }}
+          src_image_publisher: ${{ parameters.src_image_publisher }}
+          src_image_offer: ${{ parameters.src_image_offer }}
+          src_image_sku: ${{ parameters.src_image_sku }}
+          image_build_sku: ${{ parameters.image_build_sku }}
+          image_build_size: ${{ parameters.image_build_size }}
       # Build the VM image
       - task: PackerBuild@1
         inputs:
           connectedServiceName: '${{ variables.sc_name }}'
           templateType: custom
-          customTemplateLocation: ./az-packer-pipeline-template/template/image_template.pkr.hcl
+          customTemplateLocation: ./az-packer-pipeline-template/template/image_template.json
           isManagedImage: false
-          variables: |+
-            src_image_publisher=${{ parameters.src_image_publisher }}
-            src_image_offer=${{ parameters.src_image_offer }}
-            src_image_sku=${{ parameters.src_image_sku }}
-            location=${{ variables.location }}
-            rg_name=${{ variables.rg_name }}
-            image_type=${{ parameters.image_type }}
-            image_name=${{ parameters.image_name }}
-            image_build_sku=${{ parameters.image_build_sku }}
