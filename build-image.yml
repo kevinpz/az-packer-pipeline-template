@@ -1,0 +1,117 @@
+# Load the common variables repo
+resources:
+  repositories:
+  - repository: az-packer-common
+    type: github
+    endpoint: Azure
+    name: kevinpz/az-packer-common
+
+# Source the variables
+variables:
+# Load the common variables
+- template: common-variables.yml@az-packer-common
+
+parameters:
+# The source image publisher to use
+- name: src_image_publisher
+  type: string 
+# The source image offer to use
+- name: src_image_offer
+  type: string 
+# The source image sku to use
+- name: src_image_sku
+  type: string 
+# The source image sku to use
+- name: image_name
+  type: string 
+# The type of image to build
+- name: image_type
+  type: string 
+  values :
+  - Linux
+  - Windows
+# VM SKU for building the image
+- name: image_build_sku
+  type: string 
+  default: 'Standard_D2ds_v4'
+# VM size for building the image
+- name: image_build_size
+  type: number
+  default: 30
+
+stages:
+# Create the image definition in the compute image gallery
+- stage: Deploy
+  # Use the Microsoft hosted runners
+  pool:
+      vmImage: 'ubuntu-latest'
+  jobs:
+  - job: Deploy
+    steps:
+      - checkout: az-packer-pipeline-template
+      # Download Terraform binary
+      - task: TerraformInstaller@0
+        displayName: install terraform
+        inputs:
+          terraformVersion: latest
+      # Init Terraform backend and download providers
+      - task: TerraformCLI@0
+        displayName: 'terraform init'
+        inputs:
+          workingDirectory: terraform
+          command: init
+          # Configure the backend to store the .tfstate file
+          backendType: azurerm
+          backendServiceArm: '${{ variables.sc_name }}'
+          backendAzureRmSubscriptionId: '${{ variables.subscription_id }}'
+          backendAzureRmResourceGroupName: '${{ variables.stg_rg_name }}'
+          backendAzureRmStorageAccountName: '${{ variables.stg_name }}'
+          backendAzureRmContainerName: '${{ variables.stg_container_name }}'
+          backendAzureRmKey: '$(System.TeamProject)/$(Build.Repository.Name).tfstate'
+      # Deploy Terraform ressources
+      - task: TerraformCLI@0
+        displayName: 'terraform apply'
+        inputs:
+          workingDirectory: terraform
+          command: apply
+          environmentServiceName: '${{ variables.sc_name }}'
+          providerAzureRmSubscriptionId: '${{ variables.subscription_id }}'
+          commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "image_name=${{ parameters.image_name }}" -var "image_type=${{ parameters.image_type }}" -var "src_image_publisher=${{ parameters.src_image_publisher }}" -var "src_image_offer=${{ parameters.src_image_offer }}" -var "src_image_sku=${{ parameters.src_image_sku }}"'
+
+# Build the image
+- stage: Build
+  # Use the Microsoft hosted runners
+  pool:
+      vmImage: 'ubuntu-latest'
+  jobs:
+  - job: Build
+    steps:
+      # Checkout the repositories
+      - checkout: self
+      - checkout: az-packer-pipeline-template
+      # Replace the variable inside the image template
+      - task: CmdLine@2
+        inputs:
+          script: 'bash ./set_variables.sh'
+          workingDirectory: './az-packer-pipeline-template/scripts'
+        env:
+          subscription_id: ${{ variables.subscription_id }}
+          rg_name: ${{ variables.rg_name }}
+          image_name: ${{ parameters.image_name }}
+          gallery_name: ${{ variables.gallery_name }}
+          location: ${{ variables.location }}
+          id_name: ${{ variables.id_name }}
+          src_image_publisher: ${{ parameters.src_image_publisher }}
+          src_image_offer: ${{ parameters.src_image_offer }}
+          src_image_sku: ${{ parameters.src_image_sku }}
+          image_build_sku: ${{ parameters.image_build_sku }}
+          image_build_size: ${{ parameters.image_build_size }}
+      # Build the VM image
+      - task: AzureCLI@2
+        inputs:
+          workingDirectory: './az-packer-pipeline-template/scripts'
+          azureSubscription: '${{ variables.sc_name }}'
+          scriptType: 'bash'
+          scriptLocation: 'scriptPath'
+          arguments: '${{ variables.subscription_id }} ${{ variables.rg_name }}'
+          scriptPath: './az-packer-pipeline-template/scripts/build.sh'
