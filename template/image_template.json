@@ -1,7 +1,18 @@
 {
+  "variables": {
+    "client_id": "",
+    "client_secret": "",
+    "subscription_id": "",
+    "tenant_id": "",
+    "object_id": ""
+  },
   "builders": [{
     "type": "azure-arm",
-    "use_azure_cli_auth": "true",
+    "client_id": "{{user `client_id`}}",
+    "client_secret": "{{user `client_secret`}}",
+    "subscription_id": "{{user `subscription_id`}}",
+    "tenant_id": "{{user `tenant_id`}}",
+    "object_id": "{{user `object_id`}}",
     "managed_image_resource_group_name": "<rg_name>",
     "managed_image_name": "<image_name>",
     "os_type": "<image_type>",
