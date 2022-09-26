@@ -1,8 +1,8 @@
 {
   "variables": {
-    "tenant_id": "{{env `tenant_id`}}",
-    "client_id": "{{env `client_id`}}",
-    "client_secret":"{{env `client_secret`}}",
+    "tenant_id": "b34b291e-89b2-4d63-9f9c-1ac3e8f43b4f",
+    "client_id": "b34b291e-89b2-4d63-9f9c-1ac3e8f43b4f",
+    "client_secret":"b34b291e-89b2-4d63-9f9c-1ac3e8f43b4f",
     "subscription_id": "{{env `subscription_id`}}",
     "rg_name": "{{env `rg_name`}}",
     "image_name": "{{env `image_name`}}",
