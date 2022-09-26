@@ -87,7 +87,7 @@ stages:
         path: s/az-packer-image
       - checkout: az-packer-pipeline-template
       - task: AzureCLI@2
-        displayName: Azure CLI
+        displayName: Get Secrets
         name: get_secrets 
         inputs:
           azureSubscription: '${{ variables.sc_name }}'
@@ -99,8 +99,16 @@ stages:
             echo "##vso[task.setvariable variable=client_secret;isOutput=true;issecret=true]$servicePrincipalKey"
             echo "##vso[task.setvariable variable=tenant_id;isOutput=true;issecret=true]$tenantId"
             az account show
+      - task: PowerShell@2
+        displayName: Get Version
+        name: get_version
+        inputs:
+          targetType: inline
+          script: echo "##vso[task.setvariable variable=image_version;isOutput=true](Get-Date).ToString("yyyy.MM.dd.HHmm")" 
+          pwsh: true
       # Build the VM image
       - task: PackerBuild@1
+        displayName: Build image
         inputs:
           connectedServiceName: '${{ variables.sc_name }}'
           templateType: custom
@@ -114,7 +122,6 @@ stages:
           rg_name: ${{ variables.rg_name }}
           gallery_name: ${{ variables.gallery_name }}
           image_name: ${{ parameters.image_name }}
-          image_version: ${{ variables.image_version }}
           location: ${{ variables.location }}
           replication_regions: ${{ variables.replication_regions }}
           src_image_publisher: ${{ parameters.src_image_publisher }}
@@ -123,4 +130,5 @@ stages:
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
           img_stg_type: ${{ variables.img_stg_type }}
+          image_version: $(get_version.image_version)
           
