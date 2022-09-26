@@ -1,6 +1,7 @@
 {
   "builders": [{
     "type": "azure-arm",
+    "use_azure_cli_auth": "true",
     "managed_image_resource_group_name": "<rg_name>",
     "managed_image_name": "<image_name>",
     "os_type": "<image_type>",
