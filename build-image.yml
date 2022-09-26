@@ -123,8 +123,6 @@ stages:
           templateType: custom
           customTemplateLocation: ./az-packer-pipeline-template/template/image_template.json
           isManagedImage: false
-        variables:
-          defaultKey: $[ dependencies.fetchKey.outputs['writeFunctionKey.functionKey'] ]
         env:
           subscription_id: ${{ variables.depl_subscription_id }}
           rg_name: ${{ variables.rg_name }}
