@@ -85,7 +85,7 @@ stages:
       # Checkout the repositories
       - checkout: self
         path: az-packer-image
-      - checkout: az-packer-pipeline-template
+      - checkout: s/az-packer-pipeline-template
       - task: AzureCLI@2
         displayName: Azure CLI
         name: get_secrets 
