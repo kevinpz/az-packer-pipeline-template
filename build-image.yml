@@ -107,7 +107,7 @@ stages:
         displayName: Azure CLI
         inputs:
           azureSubscription: '${{ variables.sc_name }}'
-          scriptType: ps
+          scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
             az account show
