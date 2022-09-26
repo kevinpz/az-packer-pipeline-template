@@ -84,7 +84,7 @@ stages:
     steps:
       # Checkout the repositories
       - checkout: self
-        path: $(Build.Repository.LocalPath)/az-packer-image
+        path: az-packer-image
       - checkout: az-packer-pipeline-template
       - task: AzureCLI@2
         displayName: Azure CLI
