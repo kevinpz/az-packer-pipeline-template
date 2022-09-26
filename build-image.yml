@@ -105,6 +105,7 @@ stages:
       # Login to Azure
       - task: AzureCLI@2
         displayName: Azure CLI
+        name: GetSecrets 
         inputs:
           azureSubscription: '${{ variables.sc_name }}'
           addSpnToEnvironment: true
@@ -122,6 +123,8 @@ stages:
           templateType: custom
           customTemplateLocation: ./az-packer-pipeline-template/template/image_template.json
           isManagedImage: false
+        variables:
+          defaultKey: $[ dependencies.fetchKey.outputs['writeFunctionKey.functionKey'] ]
         env:
           subscription_id: ${{ variables.depl_subscription_id }}
           rg_name: ${{ variables.rg_name }}
@@ -134,9 +137,9 @@ stages:
           src_image_sku: ${{ parameters.src_image_sku }}
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
-          client_id: ${{ variables.client_id }}
-          client_secret: ${{ variables.client_secret }}
-          tenant_id: ${{ variables.tenant_id }}
+          client_id: $(GetSecrets.client_id)
+          client_secret: $(GetSecrets.client_secret)
+          tenant_id: $(GetSecrets.tenant_id)
           # customTemplateParameters: '{
           #   "subscription_id":${{ variables.depl_subscription_id }},
           #   "rg_name":"${{ variables.rg_name }}",
