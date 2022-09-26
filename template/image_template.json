@@ -16,7 +16,7 @@
   "builders": [{
     "type": "azure-arm",
     "client_secret": "{{user `client_secret`}}",
-    "subscription_id": "{{user `subscription_id`}}",
+    "subscription_id": "fdsfsdfds",
     "tenant_id": "{{user `tenant_id`}}",
     "client_id": "{{user `client_id`}}",
     "managed_image_resource_group_name":  "{{user `rg_name`}}",
