@@ -123,7 +123,7 @@ stages:
           gallery_name: ${{ variables.gallery_name }}
           image_name: ${{ parameters.image_name }}
           location: ${{ variables.location }}
-          replication_regions: ${{ variables.replication_regions }}
+          replication_regions: ${{ parameters.replication_regions }}
           src_image_publisher: ${{ parameters.src_image_publisher }}
           src_image_offer: ${{ parameters.src_image_offer }}
           src_image_sku: ${{ parameters.src_image_sku }}
