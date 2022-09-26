@@ -100,7 +100,7 @@ stages:
             az account show
       - task: CmdLine@2
         inputs:
-          script: 'pwd;echo $(Build.Repository.Name);ls'
+          script: 'pwd;echo $(Build.Repository.LocalPath);ls'
       # Build the VM image
       - task: PackerBuild@1
         inputs:
