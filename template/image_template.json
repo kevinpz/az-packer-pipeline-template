@@ -11,7 +11,11 @@
     "src_image_offer": "{{env `src_image_offer`}}",
     "src_image_sku": "{{env `src_image_sku`}}",
     "location": "{{env `location`}}",
-    "image_build_sku": "{{env `image_build_sku`}}"
+    "image_build_sku": "{{env `image_build_sku`}}",
+    "gallery_name": "{{env `gallery_name`}}",
+    "image_version": "{{env `image_version`}}",
+    "replication_regions": "{{env `replication_regions`}}",
+    "img_stg_type": "{{env `img_stg_type`}}"
   },
   "builders": [{
     "type": "azure-arm",
@@ -26,7 +30,16 @@
     "image_offer":  "{{user `src_image_offer`}}",
     "image_sku":  "{{user `src_image_sku`}}",
     "location":  "{{user `location`}}",
-    "vm_size":  "{{user `image_build_sku`}}"
+    "vm_size":  "{{user `image_build_sku`}}",
+    "shared_image_gallery_destination": {
+      "subscription": "{{user `subscription_id`}}",
+      "resource_group":"{{user `rg_name`}}",
+      "gallery_name": "{{user `gallery_name`}}",
+      "image_name": "{{user `image_name`}}",
+      "image_version": "{{user `image_version`}}",
+      "replication_regions": "{{user `replication_regions`}}",
+      "storage_account_type": "{{user `img_stg_type`}}"
+    }
   }],
 
   "provisioners": [{

@@ -99,9 +99,6 @@ stages:
             echo "##vso[task.setvariable variable=client_secret;isOutput=true;issecret=true]$servicePrincipalKey"
             echo "##vso[task.setvariable variable=tenant_id;isOutput=true;issecret=true]$tenantId"
             az account show
-      - task: CmdLine@2
-        inputs:
-          script: 'pwd;ls'
       # Build the VM image
       - task: PackerBuild@1
         inputs:
@@ -110,17 +107,20 @@ stages:
           customTemplateLocation: ./az-packer-pipeline-template/template/image_template.json
           isManagedImage: false
         env:
+          client_id: $(get_secrets.client_id)
+          client_secret: $(get_secrets.client_secret)
+          tenant_id: $(get_secrets.tenant_id)
           subscription_id: ${{ variables.depl_subscription_id }}
           rg_name: ${{ variables.rg_name }}
-          image_name: ${{ parameters.image_name }}
           gallery_name: ${{ variables.gallery_name }}
+          image_name: ${{ parameters.image_name }}
+          image_version: ${{ parameters.image_version }}
           location: ${{ variables.location }}
-          id_name: ${{ variables.id_name }}
+          replication_regions: ${{ variables.replication_regions }}
           src_image_publisher: ${{ parameters.src_image_publisher }}
           src_image_offer: ${{ parameters.src_image_offer }}
           src_image_sku: ${{ parameters.src_image_sku }}
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
-          client_id: $(get_secrets.client_id)
-          client_secret: $(get_secrets.client_secret)
-          tenant_id: $(get_secrets.tenant_id)
+          img_stg_type: ${{ parameters.img_stg_type }}
+          
