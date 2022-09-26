@@ -102,6 +102,15 @@ stages:
           src_image_sku: ${{ parameters.src_image_sku }}
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
+      # Login to Azure
+      - task: AzureCLI@2
+        displayName: Azure CLI
+        inputs:
+          azureSubscription: '${{ variables.sc_name }}'
+          scriptType: ps
+          scriptLocation: inlineScript
+          inlineScript: |
+            az account show
       # Build the VM image
       - task: PackerBuild@1
         inputs:
