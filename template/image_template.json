@@ -2,7 +2,7 @@
   "variables": {
     "client_secret":"{{env `servicePrincipalKey`}}",
     "tenant_id": "{{env `tenantId`}}",
-    "object_id": "{{env `servicePrincipalId`}}",
+    "client_id": "{{env `servicePrincipalId`}}",
     "subscription_id": "",
     "rg_name": "",
     "image_name": "",
@@ -18,7 +18,7 @@
     "client_secret": "{{user `client_secret`}}",
     "subscription_id": "{{user `subscription_id`}}",
     "tenant_id": "{{user `tenant_id`}}",
-    "object_id": "{{user `object_id`}}",
+    "client_id": "{{user `object_id`}}",
     "managed_image_resource_group_name":  "{{user `rg_name`}}",
     "managed_image_name":  "{{user `image_name`}}",
     "os_type":  "{{user `image_type`}}",
