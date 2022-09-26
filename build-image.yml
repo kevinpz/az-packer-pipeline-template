@@ -114,7 +114,7 @@ stages:
           rg_name: ${{ variables.rg_name }}
           gallery_name: ${{ variables.gallery_name }}
           image_name: ${{ parameters.image_name }}
-          image_version: ${{ parameters.image_version }}
+          image_version: ${{ variables.image_version }}
           location: ${{ variables.location }}
           replication_regions: ${{ variables.replication_regions }}
           src_image_publisher: ${{ parameters.src_image_publisher }}
@@ -122,5 +122,5 @@ stages:
           src_image_sku: ${{ parameters.src_image_sku }}
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
-          img_stg_type: ${{ parameters.img_stg_type }}
+          img_stg_type: ${{ variables.img_stg_type }}
           
