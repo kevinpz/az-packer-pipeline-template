@@ -1,9 +1,9 @@
 {
   "variables": {
-    "client_secret":"{{env `servicePrincipalKey`}}",
-    "tenant_id": "{{env `tenantId`}}",
-    "client_id": "{{env `servicePrincipalId`}}",
-    "subscription_id": "b34b291e-89b2-4d63-9f9c-1ac3e8f43b4f",
+    "tenant_id": "{{env `tenant_id`}}",
+    "client_id": "{{env `client_id`}}",
+    "client_secret":"{{env `client_secret`}}",
+    "subscription_id": "{{env `subscription_id`}}",
     "rg_name": "{{env `rg_name`}}",
     "image_name": "{{env `image_name`}}",
     "image_type": "{{env `image_type`}}",
