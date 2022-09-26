@@ -84,6 +84,7 @@ stages:
     steps:
       # Checkout the repositories
       - checkout: self
+        path: az-packer-image
       - checkout: az-packer-pipeline-template
       - task: AzureCLI@2
         displayName: Azure CLI
@@ -100,7 +101,7 @@ stages:
             az account show
       - task: CmdLine@2
         inputs:
-          script: 'pwd;echo $(Build.Repository.LocalPath);ls'
+          script: 'pwd;ls'
       # Build the VM image
       - task: PackerBuild@1
         inputs:

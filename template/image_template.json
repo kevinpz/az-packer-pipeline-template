@@ -31,6 +31,6 @@
 
   "provisioners": [{
     "type": "ansible",
-    "playbook_file": "./template/playbook.yml"
+    "playbook_file": "./az-packer-image/template/playbook.yml"
   }]
 }
