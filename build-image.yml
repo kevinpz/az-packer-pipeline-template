@@ -34,6 +34,7 @@ parameters:
 - name: image_build_sku
   type: string 
   default: 'Standard_D2ds_v4'
+- template: common-variables.yml@az-packer-common
 
 stages:
 # Create the image definition in the compute image gallery
