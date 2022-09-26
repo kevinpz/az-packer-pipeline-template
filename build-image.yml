@@ -111,9 +111,9 @@ stages:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            echo "##vso[task.setvariable variable=client_id;issecret=true]$servicePrincipalId" 
-            echo "##vso[task.setvariable variable=client_secret;issecret=true]$servicePrincipalKey"
-            echo "##vso[task.setvariable variable=tenant_id;issecret=true]$tenantId"
+            echo "##vso[task.setvariable variable=client_id;isOutput=true;issecret=true]$servicePrincipalId" 
+            echo "##vso[task.setvariable variable=client_secret;isOutput=true;issecret=true]$servicePrincipalKey"
+            echo "##vso[task.setvariable variable=tenant_id;isOutput=true;issecret=true]$tenantId"
             az account show
       # Build the VM image
       - task: PackerBuild@1
