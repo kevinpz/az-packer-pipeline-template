@@ -3,7 +3,7 @@
     "client_secret":"{{env `servicePrincipalKey`}}",
     "tenant_id": "{{env `tenantId`}}",
     "client_id": "{{env `servicePrincipalId`}}",
-    "subscription_id": "dsdsdsds",
+    "subscription_id": "b34b291e-89b2-4d63-9f9c-1ac3e8f43b4f",
     "rg_name": "{{env `rg_name`}}",
     "image_name": "{{env `image_name`}}",
     "image_type": "{{env `image_type`}}",
