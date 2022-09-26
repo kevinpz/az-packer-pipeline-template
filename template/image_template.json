@@ -18,7 +18,7 @@
     "client_secret": "{{user `client_secret`}}",
     "subscription_id": "{{user `subscription_id`}}",
     "tenant_id": "{{user `tenant_id`}}",
-    "client_id": "{{user `object_id`}}",
+    "client_id": "{{user `client_id`}}",
     "managed_image_resource_group_name":  "{{user `rg_name`}}",
     "managed_image_name":  "{{user `image_name`}}",
     "os_type":  "{{user `image_type`}}",
