@@ -1,26 +1,32 @@
 {
   "variables": {
-    "client_id": "",
-    "client_secret": "",
+    "client_secret":"{{env `servicePrincipalKey`}}",
+    "tenant_id": "{{env `tenantId`}}",
+    "object_id": "{{env `servicePrincipalId`}}",
     "subscription_id": "",
-    "tenant_id": "",
-    "object_id": ""
+    "rg_name": "",
+    "image_name": "",
+    "image_type": "",
+    "src_image_publisher": "",
+    "src_image_offer": "",
+    "src_image_sku": "",
+    "location": "",
+    "image_build_sku": ""
   },
   "builders": [{
     "type": "azure-arm",
-    "client_id": "{{user `client_id`}}",
     "client_secret": "{{user `client_secret`}}",
     "subscription_id": "{{user `subscription_id`}}",
     "tenant_id": "{{user `tenant_id`}}",
     "object_id": "{{user `object_id`}}",
-    "managed_image_resource_group_name": "<rg_name>",
-    "managed_image_name": "<image_name>",
-    "os_type": "<image_type>",
-    "image_publisher": "<src_image_publisher>",
-    "image_offer": "<src_image_offer>",
-    "image_sku": "<src_image_sku>",
-    "location": "<location>",
-    "vm_size": "<image_build_sku>"
+    "managed_image_resource_group_name":  "{{user `rg_name`}}",
+    "managed_image_name":  "{{user `image_name`}}",
+    "os_type":  "{{user `image_type`}}",
+    "image_publisher":  "{{user `src_image_publisher`}}",
+    "image_offer":  "{{user `src_image_offer`}}",
+    "image_sku":  "{{user `src_image_sku`}}",
+    "location":  "{{user `location`}}",
+    "vm_size":  "{{user `image_build_sku`}}"
   }],
 
   "provisioners": [{
