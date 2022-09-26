@@ -122,5 +122,5 @@ stages:
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
           client_id: $(get_secrets.client_id)
-          client_secret: $(variables.get_secrets.client_secret)
-          tenant_id: $(variables.get_secrets.tenant_id)
+          client_secret: $(get_secrets.client_secret)
+          tenant_id: $(get_secrets.tenant_id)
