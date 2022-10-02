@@ -10,6 +10,12 @@ resources:
 variables:
 # Load the common variables
 - template: common-variables.yml@az-packer-common
+# Define the list of replication region
+- name: replication_regions_list
+  ${{ if eq(variables['replication_regions'], '') }}:
+      value: variables.location
+  ${{ else }}:
+      value: '${{ variables.location }},${{ variables.replication_regions }}'
 
 parameters:
 # The source image publisher to use
@@ -39,8 +45,9 @@ stages:
 # Create the image definition in the compute image gallery
 - stage: Deploy
   # Use the Microsoft hosted runners
-  pool:
-      vmImage: 'ubuntu-latest'
+  pool: vm-azure
+      # Uncomment to use Microsoft managed runners
+      # vmImage: 'ubuntu-latest'
   jobs:
   - job: Deploy
     steps:
@@ -77,8 +84,9 @@ stages:
 # Build the image
 - stage: Build
   # Use the Microsoft hosted runners
-  pool:
-      vmImage: 'ubuntu-latest'
+  pool: vm-azure
+      # Uncomment to use Microsoft managed runners
+      # vmImage: 'ubuntu-latest'
   jobs:
   - job: Build
     steps:
@@ -99,13 +107,6 @@ stages:
             echo "##vso[task.setvariable variable=client_secret;isOutput=true;issecret=true]$servicePrincipalKey"
             echo "##vso[task.setvariable variable=tenant_id;isOutput=true;issecret=true]$tenantId"
             az account show
-      - task: PowerShell@2
-        displayName: Get Version
-        name: get_version
-        inputs:
-          targetType: inline
-          script: echo "##vso[task.setvariable variable=image_version;isOutput=true]$((Get-Date).ToString('yyyy.MMdd.HHmm'))" 
-          pwsh: true
       # Build the VM image
       - task: PackerBuild@1
         displayName: Build image
@@ -123,12 +124,16 @@ stages:
           gallery_name: ${{ variables.gallery_name }}
           image_name: ${{ parameters.image_name }}
           location: ${{ variables.location }}
-          replication_regions: ${{ variables.replication_regions }}
+          replication_regions: ${{ variables.replication_regions_list }}
           src_image_publisher: ${{ parameters.src_image_publisher }}
           src_image_offer: ${{ parameters.src_image_offer }}
           src_image_sku: ${{ parameters.src_image_sku }}
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
           img_stg_type: ${{ variables.img_stg_type }}
-          image_version: $(get_version.image_version)
+          image_version: $(Build.SourceBranch)
+          rg_vnet_name: ${{ variables.rg_vnet_name }}
+          vnet_name: ${{ variables.vnet_name }}
+          subnet_name: ${{ variables.subnet_name }}
+          replica_count: ${{ variables.replica_count }}
           

@@ -15,7 +15,11 @@
     "gallery_name": "{{env `gallery_name`}}",
     "image_version": "{{env `image_version`}}",
     "replication_regions": "{{env `replication_regions`}}",
-    "img_stg_type": "{{env `img_stg_type`}}"
+    "img_stg_type": "{{env `img_stg_type`}}",
+    "virtual_network_name": "{{env `virtual_network_name`}}",
+    "virtual_network_subnet_name": "{{env `virtual_network_subnet_name`}}",
+    "virtual_network_resource_group_name": "{{env `virtual_network_resource_group_name`}}",
+    "replica_count": "{{env `replica_count`}}"
   },
   "builders": [{
     "type": "azure-arm",
@@ -31,6 +35,11 @@
     "image_sku":  "{{user `src_image_sku`}}",
     "location":  "{{user `location`}}",
     "vm_size":  "{{user `image_build_sku`}}",
+    "shared_image_gallery_replica_count ":  "{{user `replica_count`}}",
+    "shared_gallery_image_version_exclude_from_latest":  true,
+    "virtual_network_name":  "{{user `vnet_name`}}",
+    "virtual_network_subnet_name ":  "{{user `subnet_name`}}",
+    "virtual_network_resource_group_name ":  "{{user `rg_vnet_name`}}",
     "shared_image_gallery_destination": {
       "subscription": "{{user `subscription_id`}}",
       "resource_group":"{{user `rg_name`}}",
