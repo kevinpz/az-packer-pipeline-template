@@ -45,7 +45,7 @@ stages:
 # Create the image definition in the compute image gallery
 - stage: Deploy
   # Use the Microsoft hosted runners
-  pool: vm-azure
+  pool: azure-vm
       # Uncomment to use Microsoft managed runners
       # vmImage: 'ubuntu-latest'
   jobs:
@@ -84,7 +84,7 @@ stages:
 # Build the image
 - stage: Build
   # Use the Microsoft hosted runners
-  pool: vm-azure
+  pool: azure-vm
       # Uncomment to use Microsoft managed runners
       # vmImage: 'ubuntu-latest'
   jobs:
