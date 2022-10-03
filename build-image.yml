@@ -13,7 +13,7 @@ variables:
 # Define the list of replication region
 - name: replication_regions_list
   ${{ if eq(variables['replication_regions'], '') }}:
-      value: variables.location
+      value: ${{ variables.location }}
   ${{ else }}:
       value: '${{ variables.location }},${{ variables.replication_regions }}'
 
@@ -61,7 +61,7 @@ stages:
       - task: TerraformCLI@0
         displayName: 'terraform init'
         inputs:
-          workingDirectory: terraform
+          workingDirectory: build
           command: init
           # Configure the backend to store the .tfstate file
           backendType: azurerm
@@ -75,7 +75,7 @@ stages:
       - task: TerraformCLI@0
         displayName: 'terraform apply'
         inputs:
-          workingDirectory: terraform
+          workingDirectory: build
           command: apply
           environmentServiceName: '${{ variables.sc_name }}'
           providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
@@ -132,7 +132,7 @@ stages:
           image_build_sku: ${{ parameters.image_build_sku }}
           image_type: ${{ parameters.image_type }}
           img_stg_type: ${{ variables.img_stg_type }}
-          image_version: $(Build.SourceBranch)
+          image_version: $(Build.SourceBranchName)
           rg_vnet_name: ${{ variables.rg_vnet_name }}
           vnet_name: ${{ variables.vnet_name }}
           subnet_name: ${{ variables.subnet_name }}
