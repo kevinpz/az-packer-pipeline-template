@@ -36,11 +36,8 @@ resource "azurerm_linux_virtual_machine" "packer" {
   network_interface_ids = [
     azurerm_network_interface.packer.id,
   ]
-
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
-  }
+  disable_password_authentication = false
+  admin_password = "${var.image_name}_${var.image_version}"
 
   os_disk {
     caching              = "ReadWrite"
@@ -48,4 +45,9 @@ resource "azurerm_linux_virtual_machine" "packer" {
   }
 
   source_image_id = azurerm_shared_image_version.packer.id
+}
+
+# Get the IP address
+output "vm_ip_addr" {
+  value = azurerm_network_interface.packer.private_ip_address
 }
