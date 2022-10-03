@@ -19,11 +19,11 @@ resource "azurerm_network_interface" "packer" {
 }
 
 # Get the image version
-data "azurerm_shared_image_version" "example" {
-  name                = var.ima
-  image_name          = "my-image"
-  gallery_name        = "my-image-gallery"
-  resource_group_name = "example-resources"
+data "azurerm_shared_image_version" "packer" {
+  name                = var.image_version
+  image_name          = var.image_name
+  gallery_name        = var.gallery_name
+  resource_group_name = var.rg_name
 }
 
 # Create a VM
@@ -47,10 +47,5 @@ resource "azurerm_linux_virtual_machine" "packer" {
     storage_account_type = "Standard_LRS"
   }
 
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
-  }
+  source_image_id = azurerm_shared_image_version.packer.id
 }

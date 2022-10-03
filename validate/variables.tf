@@ -34,6 +34,6 @@ variable "image_build_sku" {
   type = string
 }
 
-variable "image_build_sku" {
+variable "image_version" {
   type = string
 }

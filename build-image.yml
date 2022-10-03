@@ -94,6 +94,7 @@ stages:
       - checkout: self
         path: s/az-packer-image
       - checkout: az-packer-pipeline-template
+      # Get the secrets for Packer
       - task: AzureCLI@2
         displayName: Get Secrets
         name: get_secrets 
@@ -138,3 +139,41 @@ stages:
           subnet_name: ${{ variables.subnet_name }}
           replica_count: ${{ variables.replica_count }}
           
+# Deploy a VM to validate the image
+- stage: Validate
+  # Use the Microsoft hosted runners
+  pool: azure-vm
+      # Uncomment to use Microsoft managed runners
+      # vmImage: 'ubuntu-latest'
+  jobs:
+  - job: Deploy
+    steps:
+      - checkout: az-packer-pipeline-template
+      # Download Terraform binary
+      - task: TerraformInstaller@0
+        displayName: install terraform
+        inputs:
+          terraformVersion: '1.3.1'
+      # Init Terraform backend and download providers
+      - task: TerraformCLI@0
+        displayName: 'terraform init'
+        inputs:
+          workingDirectory: validate
+          command: init
+          # Configure the backend to store the .tfstate file
+          backendType: azurerm
+          backendServiceArm: '${{ variables.sc_name }}'
+          backendAzureRmSubscriptionId: '${{ variables.backend_subscription_id }}'
+          backendAzureRmResourceGroupName: '${{ variables.stg_rg_name }}'
+          backendAzureRmStorageAccountName: '${{ variables.stg_name }}'
+          backendAzureRmContainerName: '${{ variables.stg_container_name }}'
+          backendAzureRmKey: '$(System.TeamProject)/$(Build.Repository.Name)_validate.tfstate'
+      # Deploy Terraform ressources
+      - task: TerraformCLI@0
+        displayName: 'terraform apply'
+        inputs:
+          workingDirectory: build
+          command: apply
+          environmentServiceName: '${{ variables.sc_name }}'
+          providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
+          commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "image_name=${{ parameters.image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)"'
