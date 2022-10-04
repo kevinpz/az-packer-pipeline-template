@@ -197,7 +197,7 @@ stages:
       - task: TerraformCLI@0
         displayName: Terraform apply
         inputs:
-          workingDirectory: build
+          workingDirectory: validate
           command: apply
           environmentServiceName: '${{ variables.sc_name }}'
           providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
@@ -209,7 +209,7 @@ stages:
       - task: TerraformCLI@0
         displayName: Terraform output
         inputs:
-          workingDirectory: build
+          workingDirectory: validate
           command: output
           #environmentServiceName: '${{ variables.sc_name }}'
           #providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
