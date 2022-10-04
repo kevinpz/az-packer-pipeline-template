@@ -54,21 +54,25 @@ stages:
   pool: azure-vm
       # Uncomment to use Microsoft managed runners
       # vmImage: 'ubuntu-latest'
+
   jobs:
   - job: Deploy
     steps:
       - checkout: az-packer-pipeline-template
+
       # Download Terraform binary
       - task: TerraformInstaller@0
         displayName: Install terraform
         inputs:
           terraformVersion: '1.3.1'
+
       # Init Terraform backend and download providers
       - task: TerraformCLI@0
         displayName: Terraform init
         inputs:
           workingDirectory: build
           command: init
+
           # Configure the backend to store the .tfstate file
           backendType: azurerm
           backendServiceArm: '${{ variables.sc_name }}'
@@ -77,6 +81,7 @@ stages:
           backendAzureRmStorageAccountName: '${{ variables.stg_name }}'
           backendAzureRmContainerName: '${{ variables.stg_container_name }}'
           backendAzureRmKey: '$(System.TeamProject)/$(Build.Repository.Name).tfstate'
+
       # Deploy Terraform ressources
       - task: TerraformCLI@0
         displayName: Terraform apply
@@ -100,6 +105,7 @@ stages:
       - checkout: self
         path: s/az-packer-image
       - checkout: az-packer-pipeline-template
+
       # Get the secrets for Packer
       - task: AzureCLI@2
         displayName: Get Secrets
@@ -114,6 +120,7 @@ stages:
             echo "##vso[task.setvariable variable=client_secret;isOutput=true;issecret=true]$servicePrincipalKey"
             echo "##vso[task.setvariable variable=tenant_id;isOutput=true;issecret=true]$tenantId"
             az account show
+
       # Build the VM image
       - task: PackerBuild@1
         displayName: Build image
@@ -151,15 +158,18 @@ stages:
   pool: azure-vm
       # Uncomment to use Microsoft managed runners
       # vmImage: 'ubuntu-latest'
+
   jobs:
   - job: Deploy
     steps:
       - checkout: az-packer-pipeline-template
       # Download Terraform binary
+
       - task: TerraformInstaller@0
         displayName: Install terraform
         inputs:
           terraformVersion: '1.3.1'
+
       # Generate a random password
       - task: Bash@3
         displayName: Generate VM password
@@ -167,6 +177,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: echo "##vso[task.setvariable variable=vm_password;isOutput=true;issecret=true]$(date +%s | sha256sum | base64 | head -c 32)" 
+     
       # Init Terraform backend and download providers
       - task: TerraformCLI@0
         displayName: Terraform init
@@ -181,6 +192,7 @@ stages:
           backendAzureRmStorageAccountName: '${{ variables.stg_name }}'
           backendAzureRmContainerName: '${{ variables.stg_container_name }}'
           backendAzureRmKey: '$(System.TeamProject)/$(Build.Repository.Name)_validate.tfstate'
+
       # Deploy Terraform ressources
       - task: TerraformCLI@0
         displayName: Terraform apply
@@ -192,25 +204,33 @@ stages:
           commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "dst_image_name=${{ parameters.dst_image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)" -var "vm_password=$(Build.SourceBranchName)"'
         env:
           vm_password: $(create_password.vm_password)
+
+      # Get VM IP
+      - task: TerraformCLI@0
+        displayName: Terraform output
+        inputs:
+          workingDirectory: build
+          command: output
+          #environmentServiceName: '${{ variables.sc_name }}'
+          #providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
+          #commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "dst_image_name=${{ parameters.dst_image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)" -var "vm_password=$(Build.SourceBranchName)"'
+      
       # Use ansible to validate the image
       - task: Ansible@0
         displayName: Validate the image
         inputs:
           ansibleInterface: 'agentMachine'
           playbookPathOnAgentMachine: '"./az-packer-image/validate/playbook.yml"'
-          inventoriesAgentMachine: 'file'
-          inventoryFileOnAgentMachine: 'hosts.ini'
           failOnStdErr: false
           inventoriesAgentMachine: inlineContent
           inventoryInlineContentAgentMachine: |
             [packer]
-            "${{ parameters.vmname }}".jameslast.com
-          args: -v -e sap_sid="${{ parameters.sid }}"
+            "$(vm_ip)""
+          args: --extra-vars "ansible_user=adminuser ansible_password=$(vm_password)"
         env:
-          vm_password: $(create_password.vm_password)
-
-
-                  args: '--extra-vars "build_source_dir=$(Build.SourcesDirectory) AGENT_URL=$(AGENT_URL)"'
+          vm_password: $(create_password.TF_OUT_SOME_STRING)
+          vm_ip: $(create_password.TF_OUT_VM_IP_ADDR)
+          
       # Destroy Terraform ressources
       - task: TerraformCLI@0
         displayName: Terraform destroy
