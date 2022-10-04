@@ -13,7 +13,7 @@ data "azurerm_subnet" "packer" {
 
 # Create a NIC
 resource "azurerm_network_interface" "packer" {
-  name                = "nic-packer-${var.image_name}"
+  name                = "nic-packer-${var.dst_image_name}"
   location            = azurerm_resource_group.rg_image.location
   resource_group_name = azurerm_resource_group.rg_image.name
 
