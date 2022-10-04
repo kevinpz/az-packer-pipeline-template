@@ -237,7 +237,7 @@ stages:
         displayName: Terraform destroy
         condition: always()
         inputs:
-          workingDirectory: build
+          workingDirectory: validate
           command: destroy
           environmentServiceName: '${{ variables.sc_name }}'
           providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
