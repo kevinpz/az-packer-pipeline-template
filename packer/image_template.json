@@ -44,7 +44,7 @@
       "subscription": "{{user `subscription_id`}}",
       "resource_group":"{{user `rg_name`}}",
       "gallery_name": "{{user `gallery_name`}}",
-      "image_name": "{{user `image_name`}}",
+      "image_name": "{{user `dst_image_name`}}",
       "image_version": "{{user `image_version`}}",
       "replication_regions": ["{{user `replication_regions`}}"],
       "storage_account_type": "{{user `img_stg_type`}}"
