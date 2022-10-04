@@ -177,6 +177,14 @@ stages:
         inputs:
           targetType: 'inline'
           script: echo "##vso[task.setvariable variable=vm_password;isOutput=true;issecret=true]$(date +%s | sha256sum | base64 | head -c 32)" 
+      # Generate a random password
+      - task: Bash@3
+        displayName: Get VM password
+        inputs:
+          targetType: 'inline'
+          script: echo $(vm_password)
+        env:
+          vm_password: $(create_password.vm_password)
      
       # Init Terraform backend and download providers
       - task: TerraformCLI@0
