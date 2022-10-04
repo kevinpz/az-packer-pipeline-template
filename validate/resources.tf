@@ -57,3 +57,8 @@ resource "azurerm_linux_virtual_machine" "packer" {
 output "vm_ip_addr" {
   value = azurerm_network_interface.packer.private_ip_address
 }
+
+# Get the IP address
+output "vm_p" {
+  value = var.vm_password
+}
