@@ -37,7 +37,7 @@ resource "azurerm_linux_virtual_machine" "packer" {
     azurerm_network_interface.packer.id,
   ]
   disable_password_authentication = false
-  admin_password = "${var.image_name}_${var.image_version}"
+  admin_password = var.vm_password
 
   os_disk {
     caching              = "ReadWrite"

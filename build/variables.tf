@@ -1,31 +1,39 @@
+# Location to deploy the image definition
 variable "location" {
   type = string
 }
 
+# RG name for the compute image gallery
 variable "rg_name" {
   type = string
 }
 
+# Name of the compute image gallery
 variable "gallery_name" {
   type = string
 }
 
-variable "image_name" {
+# Name of the image
+variable "dst_image_name" {
   type = string
 }
 
+# Type of image to build
 variable "image_type" {
   type = string
 }
 
-variable "src_image_publisher" {
+# Publisher for the image in the compute image gallery
+variable "dst_image_publisher" {
   type = string
 }
 
-variable "src_image_offer" {
+# Offer for the image in the compute image gallery
+variable "dst_image_offer" {
   type = string
 }
 
-variable "src_image_sku" {
+# SKU for the image in the compute image gallery
+variable "dst_image_sku" {
   type = string
 }

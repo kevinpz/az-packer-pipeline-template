@@ -27,8 +27,14 @@ parameters:
 # The source image sku to use
 - name: src_image_sku
   type: string 
-# The source image sku to use
-- name: image_name
+# The destination image name
+- name: dst_image_name
+  type: string 
+# The destination image offer
+- name: dst_image_offer
+  type: string 
+# The destination image sku
+- name: dst_image_sku
   type: string 
 # The type of image to build
 - name: image_type
@@ -54,12 +60,12 @@ stages:
       - checkout: az-packer-pipeline-template
       # Download Terraform binary
       - task: TerraformInstaller@0
-        displayName: install terraform
+        displayName: Install terraform
         inputs:
           terraformVersion: '1.3.1'
       # Init Terraform backend and download providers
       - task: TerraformCLI@0
-        displayName: 'terraform init'
+        displayName: Terraform init
         inputs:
           workingDirectory: build
           command: init
@@ -73,13 +79,13 @@ stages:
           backendAzureRmKey: '$(System.TeamProject)/$(Build.Repository.Name).tfstate'
       # Deploy Terraform ressources
       - task: TerraformCLI@0
-        displayName: 'terraform apply'
+        displayName: Terraform apply
         inputs:
           workingDirectory: build
           command: apply
           environmentServiceName: '${{ variables.sc_name }}'
           providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
-          commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "image_name=${{ parameters.image_name }}" -var "image_type=${{ parameters.image_type }}" -var "src_image_publisher=${{ parameters.src_image_publisher }}" -var "src_image_offer=${{ parameters.src_image_offer }}" -var "src_image_sku=${{ parameters.src_image_sku }}"'
+          commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "image_name=${{ parameters.dst_image_name }}" -var "image_type=${{ parameters.image_type }}" -var "dst_image_publisher=${{ variables.dst_image_publisher }}" -var "dst_image_offer=${{ parameters.dst__image_offer }}" -var "dst_image_sku=${{ parameters.dst_image_sku }}"'
 
 # Build the image
 - stage: Build
@@ -114,7 +120,7 @@ stages:
         inputs:
           connectedServiceName: '${{ variables.sc_name }}'
           templateType: custom
-          customTemplateLocation: ./az-packer-pipeline-template/template/image_template.json
+          customTemplateLocation: ./az-packer-pipeline-template/packer/image_template.json
           isManagedImage: false
           packerVersion: '1.8.3'
         env:
@@ -124,7 +130,7 @@ stages:
           subscription_id: ${{ variables.depl_subscription_id }}
           rg_name: ${{ variables.rg_name }}
           gallery_name: ${{ variables.gallery_name }}
-          image_name: ${{ parameters.image_name }}
+          dst_image_name: ${{ parameters.dst_image_name }}
           location: ${{ variables.location }}
           replication_regions: ${{ variables.replication_regions_list }}
           src_image_publisher: ${{ parameters.src_image_publisher }}
@@ -151,12 +157,19 @@ stages:
       - checkout: az-packer-pipeline-template
       # Download Terraform binary
       - task: TerraformInstaller@0
-        displayName: install terraform
+        displayName: Install terraform
         inputs:
           terraformVersion: '1.3.1'
+      # Generate a random password
+      - task: Bash@3
+        displayName: Generate VM password
+        name: create_password 
+        inputs:
+          targetType: 'inline'
+          script: echo "##vso[task.setvariable variable=vm_password;isOutput=true;issecret=true]$(date +%s | sha256sum | base64 | head -c 32)" 
       # Init Terraform backend and download providers
       - task: TerraformCLI@0
-        displayName: 'terraform init'
+        displayName: Terraform init
         inputs:
           workingDirectory: validate
           command: init
@@ -170,13 +183,15 @@ stages:
           backendAzureRmKey: '$(System.TeamProject)/$(Build.Repository.Name)_validate.tfstate'
       # Deploy Terraform ressources
       - task: TerraformCLI@0
-        displayName: 'terraform apply'
+        displayName: Terraform apply
         inputs:
           workingDirectory: build
           command: apply
           environmentServiceName: '${{ variables.sc_name }}'
           providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
-          commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "image_name=${{ parameters.image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)"'
+          commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "dst_image_name=${{ parameters.dst_image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)" -var "vm_password=$(Build.SourceBranchName)"'
+        env:
+          vm_password: $(create_password.vm_password)
       # Use ansible to validate the image
       - task: Ansible@0
         displayName: Validate the image
@@ -188,8 +203,23 @@ stages:
           failOnStdErr: false
           inventoriesAgentMachine: inlineContent
           inventoryInlineContentAgentMachine: |
-          [packer]
-          "${{ parameters.vmname }}".jameslast.com
+            [packer]
+            "${{ parameters.vmname }}".jameslast.com
           args: -v -e sap_sid="${{ parameters.sid }}"
         env:
-          AZURE_SECRET: $(AZURE_SECRET)
+          vm_password: $(create_password.vm_password)
+
+
+                  args: '--extra-vars "build_source_dir=$(Build.SourcesDirectory) AGENT_URL=$(AGENT_URL)"'
+      # Destroy Terraform ressources
+      - task: TerraformCLI@0
+        displayName: Terraform destroy
+        condition: always()
+        inputs:
+          workingDirectory: build
+          command: destroy
+          environmentServiceName: '${{ variables.sc_name }}'
+          providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
+          commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "dst_image_name=${{ parameters.dst_image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)" -var "vm_password=$(Build.SourceBranchName)"'
+        env:
+          vm_password: $(create_password.vm_password)
