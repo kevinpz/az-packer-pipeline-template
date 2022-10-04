@@ -14,7 +14,7 @@ variable "gallery_name" {
 }
 
 # Name of the image
-variable "image_name" {
+variable "dst_image_name" {
   type = string
 }
 
