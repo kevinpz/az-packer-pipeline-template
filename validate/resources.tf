@@ -19,7 +19,7 @@ resource "azurerm_network_interface" "packer" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.packer.id
+    subnet_id                     = data.azurerm_subnet.packer.id
     private_ip_address_allocation = "Dynamic"
   }
 }
