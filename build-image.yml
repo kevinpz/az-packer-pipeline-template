@@ -208,6 +208,7 @@ stages:
       # Get VM IP
       - task: TerraformCLI@0
         displayName: Terraform output
+        name: get_ip 
         inputs:
           workingDirectory: validate
           command: output
@@ -228,8 +229,8 @@ stages:
             "$(vm_ip)""
           args: --extra-vars "ansible_user=adminuser ansible_password=$(vm_password)"
         env:
-          vm_password: $(create_password.TF_OUT_SOME_STRING)
-          vm_ip: $(create_password.TF_OUT_VM_IP_ADDR)
+          vm_password: $(create_password.vm_password)
+          vm_ip: $(get_ip.TF_OUT_VM_IP_ADDR)
 
       # Destroy Terraform ressources
       - task: TerraformCLI@0
