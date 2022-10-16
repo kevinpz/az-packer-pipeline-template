@@ -234,6 +234,7 @@ stages:
           args: --extra-vars "ansible_user=adminuser ansible_password=${vm_password}"
         env:
           vm_password: $(create_password.vm_password)
+          ANSIBLE_HOST_KEY_CHECKING: False
 
       # Destroy Terraform ressources
       - task: TerraformCLI@0
