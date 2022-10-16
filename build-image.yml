@@ -217,8 +217,8 @@ stages:
           environmentServiceName: '${{ variables.sc_name }}'
           providerAzureRmSubscriptionId: '${{ variables.depl_subscription_id }}'
           #commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "dst_image_name=${{ parameters.dst_image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)"'
-        env:
-          TF_VAR_vm_password: $(create_password.vm_password)
+        #env:
+        #  TF_VAR_vm_password: $(create_password.vm_password)
 
       # Use ansible to validate the image
       - task: Ansible@0
