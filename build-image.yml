@@ -220,6 +220,11 @@ stages:
         #env:
         #  TF_VAR_vm_password: $(create_password.vm_password)
 
+      - bash: |
+        echo 'some_string is $(TF_OUT_VM_IP_ADDR)'
+        export
+      displayName: echo tf output vars
+
       # Use ansible to validate the image
       - task: Ansible@0
         displayName: Validate the image
