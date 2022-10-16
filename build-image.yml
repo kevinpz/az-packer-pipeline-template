@@ -162,9 +162,12 @@ stages:
   jobs:
   - job: Deploy
     steps:
+      # Checkout the repositories
+      - checkout: self
+        path: s/az-packer-image
       - checkout: az-packer-pipeline-template
+      
       # Download Terraform binary
-
       - task: TerraformInstaller@0
         displayName: Install terraform
         inputs:
