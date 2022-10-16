@@ -220,11 +220,6 @@ stages:
         #env:
         #  TF_VAR_vm_password: $(create_password.vm_password)
 
-      - bash: |
-          echo 'some_string is $(TF_OUT_VM_IP_ADDR)'
-          export
-        displayName: echo tf output vars
-
       # Use ansible to validate the image
       - task: Ansible@0
         displayName: Validate the image
@@ -235,11 +230,10 @@ stages:
           inventoriesAgentMachine: inlineContent
           inventoryInlineContentAgentMachine: |
             [packer]
-            ${vm_ip}
+            ${TF_OUT_VM_IP_ADDR}
           args: --extra-vars "ansible_user=adminuser ansible_password=${vm_password}"
         env:
           vm_password: $(create_password.vm_password)
-          vm_ip: $(get_ip.TF_OUT_VM_IP_ADDR)
 
       # Destroy Terraform ressources
       - task: TerraformCLI@0
