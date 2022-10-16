@@ -228,8 +228,8 @@ stages:
           inventoriesAgentMachine: inlineContent
           inventoryInlineContentAgentMachine: |
             [packer]
-            $(vm_ip)
-          args: --extra-vars "ansible_user=adminuser ansible_password=$(vm_password)"
+            ${vm_ip}
+          args: --extra-vars "ansible_user=adminuser ansible_password=${vm_password}"
         env:
           vm_password: $(create_password.vm_password)
           vm_ip: $(get_ip.TF_OUT_VM_IP_ADDR)
