@@ -50,7 +50,6 @@ parameters:
 stages:
 # Create the image definition in the compute image gallery
 - stage: Deploy
-  # Use the Microsoft hosted runners
   pool: azure-vm
       # Uncomment to use Microsoft managed runners
       # vmImage: 'ubuntu-latest'
@@ -94,7 +93,6 @@ stages:
 
 # Build the image
 - stage: Build
-  # Use the Microsoft hosted runners
   pool: azure-vm
       # Uncomment to use Microsoft managed runners
       # vmImage: 'ubuntu-latest'
@@ -154,7 +152,6 @@ stages:
           
 # Deploy a VM to validate the image
 - stage: Validate
-  # Use the Microsoft hosted runners
   pool: azure-vm
       # Uncomment to use Microsoft managed runners
       # vmImage: 'ubuntu-latest'
@@ -180,6 +177,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: echo "##vso[task.setvariable variable=vm_password;isOutput=true;issecret=true]$(date +%s | sha256sum | base64 | head -c 32)" 
+      
       # Init Terraform backend and download providers
       - task: TerraformCLI@0
         displayName: Terraform init
@@ -248,3 +246,29 @@ stages:
           commandOptions: '-var "location=${{ variables.location }}" -var "rg_name=${{ variables.rg_name }}" -var "gallery_name=${{ variables.gallery_name }}" -var "dst_image_name=${{ parameters.dst_image_name }}" -var "image_type=${{ parameters.image_type }}" -var "rg_vnet_name=${{ variables.rg_vnet_name }}" -var "vnet_name=${{ variables.vnet_name }}" -var "subnet_name=${{ variables.subnet_name }}" -var "image_build_sku=${{ parameters.image_build_sku }}" -var "image_version=$(Build.SourceBranchName)"'
         env:
           TF_VAR_vm_password: $(create_password.vm_password)
+
+# Promote the image to latest
+- stage: Promote
+  pool: azure-vm
+      # Uncomment to use Microsoft managed runners
+      # vmImage: 'ubuntu-latest'
+  jobs:
+  - job: Promote
+    steps:
+      # Checkout the repositories
+      - checkout: self
+        path: s/az-packer-image
+      - checkout: az-packer-pipeline-template
+
+      # Promote the image to the latest
+      - task: AzureCLI@2
+        displayName: Set image to latest
+        name: promote_latest 
+        inputs:
+          azureSubscription: '${{ variables.sc_name }}'
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az sig image-version update -g ${{ variables.rg_name }} --gallery-name ${{ variables.gallery_name }} \
+              --gallery-image-definition ${{ parameters.dst_image_name }} --gallery-image-version $(Build.SourceBranchName) \
+              --set excludeFromLatest=false
