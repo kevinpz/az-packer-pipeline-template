@@ -271,4 +271,4 @@ stages:
           inlineScript: |
             az sig image-version update -g ${{ variables.rg_name }} --gallery-name ${{ variables.gallery_name }} \
               --gallery-image-definition ${{ parameters.dst_image_name }} --gallery-image-version $(Build.SourceBranchName) \
-              --set excludeFromLatest=false
+              --add excludeFromLatest=false
