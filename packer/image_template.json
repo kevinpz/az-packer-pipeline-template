@@ -47,7 +47,7 @@
       "image_name": "{{user `dst_image_name`}}",
       "image_version": "{{user `image_version`}}",
       "replication_regions": ["{{user `replication_regions`}}"],
-      "storage_account_type": "{{user `img_stg_type`}}",
+      "storage_account_type": "{{user `img_stg_type`}}"
     }
   }],
 
